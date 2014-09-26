@@ -3,18 +3,19 @@ package com.criteo.kafka;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricPredicate;
-import com.yammer.metrics.reporting.GraphiteReporter;
-
 import kafka.metrics.KafkaMetricsConfig;
 import kafka.metrics.KafkaMetricsReporter;
-import kafka.metrics.KafkaMetricsReporterMBean;
 import kafka.utils.VerifiableProperties;
+
+import org.apache.log4j.Logger;
+
+import com.criteo.kafka.KafkaGraphiteMetricsReporterMBean;
+import com.criteo.kafka.RegexMetricPredicate;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Clock;
+import com.yammer.metrics.core.MetricPredicate;
+import com.yammer.metrics.reporting.GraphiteReporter;
+import com.yammer.metrics.reporting.GraphiteReporter.DefaultSocketProvider;
 
 public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 	KafkaGraphiteMetricsReporterMBean {
@@ -43,6 +44,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 			reporter.start(pollingPeriodSecs, TimeUnit.SECONDS);
 			running = true;
 			LOG.info(String.format("Started Kafka Graphite metrics reporter with polling period %d seconds", pollingPeriodSecs));
+			//System.out.println(String.format("Started Kafka Graphite metrics reporter with polling period %d seconds", pollingPeriodSecs));
 		}
 	}
 
@@ -55,11 +57,10 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             try {
             	reporter = new GraphiteReporter(
             			Metrics.defaultRegistry(),
-            			graphiteHost,
-            			graphitePort,
-            			graphiteGroupPrefix/*,
-            			predicate*/
-            			);
+            			graphiteGroupPrefix,
+            			predicate,
+            			new DefaultSocketProvider(graphiteHost, graphitePort),
+            			Clock.defaultClock());
             } catch (IOException e) {
             	LOG.error("Unable to initialize GraphiteReporter", e);
             }
@@ -73,21 +74,23 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             graphiteHost = props.getString("kafka.graphite.metrics.host", GRAPHITE_DEFAULT_HOST);
             graphitePort = props.getInt("kafka.graphite.metrics.port", GRAPHITE_DEFAULT_PORT);
             graphiteGroupPrefix = props.getString("kafka.graphite.metrics.group", GRAPHITE_DEFAULT_PREFIX);
-            String regex = props.getString("kafka.graphite.metrics.exclude.regex", null);
+            String regex = props.getString("kafka.graphite.metrics.filter.regex", null);
 
             LOG.debug("Initialize GraphiteReporter ["+graphiteHost+","+graphitePort+","+graphiteGroupPrefix+"]");
+            //System.out.println("Initialize GraphiteReporter ["+graphiteHost+","+graphitePort+","+graphiteGroupPrefix+"]");
 
-            if (regex != null) {
+            if (regex != null)
             	predicate = new RegexMetricPredicate(regex);
-            }
+            else
+            	predicate = MetricPredicate.ALL;
+            
             try {
             	reporter = new GraphiteReporter(
             			Metrics.defaultRegistry(),
-            			graphiteHost,
-            			graphitePort,
-            			graphiteGroupPrefix/*,
-            			predicate*/
-            			);
+            			graphiteGroupPrefix,
+            			predicate,
+            			new DefaultSocketProvider(graphiteHost, graphitePort),
+            			Clock.defaultClock());
             } catch (IOException e) {
             	LOG.error("Unable to initialize GraphiteReporter", e);
             }

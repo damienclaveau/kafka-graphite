@@ -19,8 +19,8 @@ public class RegexMetricPredicate implements MetricPredicate {
 	
 	@Override
 	public boolean matches(MetricName name, Metric metric) {
-		boolean ok = !pattern.matcher(name.getName()).matches();
-		//LOG.info(String.format("name: %s - %s", name.getName(), ok));
+		boolean ok = pattern.matcher(name.getMBeanName()).matches();
+		//LOG(String.format("name: %s - %s", name.getMBeanName(), ok));
 		return ok;
 	}
 
