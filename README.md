@@ -30,13 +30,18 @@ Here is a list of default properties used:
     kafka.graphite.metrics.host=localhost
     kafka.graphite.metrics.port=8649
     kafka.graphite.metrics.group=kafka
-    # This can be use to exclude some metrics from graphite 
+    # This can be use to filter some metrics from graphite
     # since kafka has quite a lot of metrics, it is useful
     # if you have many topics/partitions.
-    kafka.graphite.metrics.exclude.regex=<not set>
+    kafka.graphite.metrics.filter.regex="kafka.server":type="BrokerTopicMetrics",.*
 
 Usage As Lib
 -----------
 
-Simply build the jar and publish it to your maven internal repository (this 
+Simply build the jar and publish it to your maven internal repository (this
 package is not published to any public repositories unfortunately).
+
+This fork
+--------
+
+In this fork the filtering option is working. Only the nodes matching with the regex will be exported.
