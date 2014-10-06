@@ -7,7 +7,7 @@
   <groupId>com.criteo.kafka</groupId>
   <artifactId>kafka-graphite</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <name>Kafka metrics output to Graphite</name>
   <url>http://maven.criteo</url>
 

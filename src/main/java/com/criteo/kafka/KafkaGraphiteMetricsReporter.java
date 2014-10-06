@@ -44,7 +44,6 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 			reporter.start(pollingPeriodSecs, TimeUnit.SECONDS);
 			running = true;
 			LOG.info(String.format("Started Kafka Graphite metrics reporter with polling period %d seconds", pollingPeriodSecs));
-			//System.out.println(String.format("Started Kafka Graphite metrics reporter with polling period %d seconds", pollingPeriodSecs));
 		}
 	}
 
@@ -77,7 +76,6 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             String regex = props.getString("kafka.graphite.metrics.filter.regex", null);
 
             LOG.debug("Initialize GraphiteReporter ["+graphiteHost+","+graphitePort+","+graphiteGroupPrefix+"]");
-            //System.out.println("Initialize GraphiteReporter ["+graphiteHost+","+graphitePort+","+graphiteGroupPrefix+"]");
 
             if (regex != null)
             	predicate = new RegexMetricPredicate(regex);
