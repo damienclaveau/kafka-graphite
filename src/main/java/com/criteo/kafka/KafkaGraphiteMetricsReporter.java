@@ -1,6 +1,7 @@
 package com.criteo.kafka;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import kafka.metrics.KafkaMetricsConfig;
@@ -32,6 +33,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
     int graphitePort = GRAPHITE_DEFAULT_PORT;
     String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
     MetricPredicate predicate = MetricPredicate.ALL;
+    private ScheduledExecutorService executor;
 
 	@Override
 	public String getMBeanName() {
@@ -41,7 +43,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 	@Override
 	public synchronized void startReporter(long pollingPeriodSecs) {
 		if (initialized && !running) {
-			reporter.start(pollingPeriodSecs, TimeUnit.SECONDS);
+			executor.scheduleAtFixedRate(reporter, pollingPeriodSecs, pollingPeriodSecs, TimeUnit.SECONDS);
 			running = true;
 			LOG.info(String.format("Started Kafka Graphite metrics reporter with polling period %d seconds", pollingPeriodSecs));
 		}
@@ -50,7 +52,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 	@Override
 	public synchronized void stopReporter() {
 		if (initialized && running) {
-			reporter.shutdown();
+			executor.shutdown();
 			running = false;
 			LOG.info("Stopped Kafka Graphite metrics reporter");
             try {
@@ -76,6 +78,8 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             String regex = props.getString("kafka.graphite.metrics.filter.regex", null);
 
             LOG.debug("Initialize GraphiteReporter ["+graphiteHost+","+graphitePort+","+graphiteGroupPrefix+"]");
+
+            executor = Metrics.defaultRegistry().newScheduledThreadPool(1, "MetricReporter");
 
             if (regex != null)
             	predicate = new RegexMetricPredicate(regex);
