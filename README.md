@@ -11,8 +11,8 @@ available here https://github.com/criteo/kafka-ganglia
 Install On Broker
 ------------
 
-1. Build the `kafka-graphite-1.1.0.jar` jar using `mvn package`.
-2. Add `kafka-graphite-1.1.0.jar` and `metrics-graphite-2.2.0.jar` to the `libs/` 
+1. Build the `kafka-graphite-1.1.6.jar` jar using `mvn package`.
+2. Add `kafka-graphite-1.1.6.jar` and `metrics-graphite-2.2.0.jar` to the `libs/` 
    directory of your kafka broker installation
 3. Configure the broker (see the configuration section below)
 4. Restart the broker

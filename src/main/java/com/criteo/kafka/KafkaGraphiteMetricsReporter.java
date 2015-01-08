@@ -20,10 +20,12 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 	static String GRAPHITE_DEFAULT_HOST = "localhost";
 	static int GRAPHITE_DEFAULT_PORT = 2003;
 	static String GRAPHITE_DEFAULT_PREFIX = "kafka";
+	static boolean HIDE_METER_MEANS_DEFAULT = false;  // Export all metrics by default
 
 	String graphiteHost = GRAPHITE_DEFAULT_HOST;
 	int graphitePort = GRAPHITE_DEFAULT_PORT;
 	String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
+	boolean hideMetersMeans = HIDE_METER_MEANS_DEFAULT;
 
 	GraphiteReporter reporter = null;
     MetricPredicate predicate = MetricPredicate.ALL;
@@ -52,7 +54,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 			executor.shutdown();
 			running = false;
 			LOG.info("Stopped Kafka Graphite metrics reporter");
-			reporter = createReporter(graphiteHost, graphitePort, graphiteGroupPrefix, predicate);
+			reporter = createReporter(graphiteHost, graphitePort, graphiteGroupPrefix, predicate, hideMetersMeans);
 		}
 	}
 
@@ -65,6 +67,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             graphiteGroupPrefix = props.getString("kafka.graphite.metrics.group", GRAPHITE_DEFAULT_PREFIX);
             String regex = props.getString("kafka.graphite.metrics.filter.regex", null);
 			String logDir = props.getString("kafka.graphite.metrics.logFile", null);
+			hideMetersMeans = props.getBoolean("kafka.graphite.metrics.hideMetersMeans", false);
 
 			if (logDir != null) {
 				setLogFile(logDir);
@@ -79,7 +82,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             else
             	predicate = MetricPredicate.ALL;
 
-			reporter = createReporter(graphiteHost, graphitePort, graphiteGroupPrefix, predicate);
+			reporter = createReporter(graphiteHost, graphitePort, graphiteGroupPrefix, predicate, hideMetersMeans);
 
             if (props.getBoolean("kafka.graphite.metrics.reporter.enabled", false)) {
             	initialized = true;
@@ -90,7 +93,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 	}
 
 	private GraphiteReporter createReporter(String graphiteHost, int graphitePort, String graphiteGroupPrefix,
-											MetricPredicate predicate){
+											MetricPredicate predicate, boolean hideMetersMeans){
 		GraphiteReporter reporter = null;
 
 		try {
@@ -100,6 +103,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 					predicate,
 					new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
 					Clock.defaultClock());
+			reporter.setHideMetersMeans(hideMetersMeans);
 		} catch (IOException e) {
 			LOG.error("Unable to initialize GraphiteReporter", e);
 		}
