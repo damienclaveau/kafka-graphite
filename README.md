@@ -11,8 +11,8 @@ available here https://github.com/criteo/kafka-ganglia
 Install On Broker
 ------------
 
-1. Build the `kafka-graphite-1.0.0.jar` jar using `mvn package`.
-2. Add `kafka-graphite-1.0.0.jar` and `metrics-graphite-2.2.0.jar` to the `libs/` 
+1. Build the `kafka-graphite-1.1.6.jar` jar using `mvn package`.
+2. Add `kafka-graphite-1.1.6.jar` and `metrics-graphite-2.2.0.jar` to the `libs/` 
    directory of your kafka broker installation
 3. Configure the broker (see the configuration section below)
 4. Restart the broker
@@ -30,13 +30,14 @@ Here is a list of default properties used:
     kafka.graphite.metrics.host=localhost
     kafka.graphite.metrics.port=8649
     kafka.graphite.metrics.group=kafka
-    # This can be use to exclude some metrics from graphite 
+    # This can be use to filter some metrics from graphite
     # since kafka has quite a lot of metrics, it is useful
     # if you have many topics/partitions.
-    kafka.graphite.metrics.exclude.regex=<not set>
+    # Only metrics matching with the pattern will be written to graphite.
+    kafka.graphite.metrics.filter.regex="kafka.server":type="BrokerTopicMetrics",.*
 
 Usage As Lib
 -----------
 
-Simply build the jar and publish it to your maven internal repository (this 
+Simply build the jar and publish it to your maven internal repository (this
 package is not published to any public repositories unfortunately).
