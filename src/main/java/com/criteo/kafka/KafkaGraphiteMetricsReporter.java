@@ -21,6 +21,7 @@ package com.criteo.kafka;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import com.yammer.metrics.core.Clock;
 import org.apache.log4j.Logger;
 
 import com.yammer.metrics.Metrics;
@@ -73,10 +74,10 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             try {
             	reporter = new GraphiteReporter(
             			Metrics.defaultRegistry(),
-            			graphiteHost,
-            			graphitePort,
-            			graphiteGroupPrefix/*,
-            			predicate*/
+            			graphiteGroupPrefix,
+            			predicate,
+                        new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
+                        Clock.defaultClock()
             			);
             } catch (IOException e) {
             	LOG.error("Unable to initialize GraphiteReporter", e);
@@ -97,14 +98,16 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 
             if (regex != null) {
             	predicate = new RegexMetricPredicate(regex);
+            } else {
+                predicate = MetricPredicate.ALL;
             }
             try {
             	reporter = new GraphiteReporter(
             			Metrics.defaultRegistry(),
-            			graphiteHost,
-            			graphitePort,
-            			graphiteGroupPrefix/*,
-            			predicate*/
+            			graphiteGroupPrefix,
+            			predicate,
+                        new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
+                        Clock.defaultClock()
             			);
             } catch (IOException e) {
             	LOG.error("Unable to initialize GraphiteReporter", e);
