@@ -24,31 +24,28 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.reporting.GraphiteReporter;
 
 import kafka.metrics.KafkaMetricsConfig;
 import kafka.metrics.KafkaMetricsReporter;
-import kafka.metrics.KafkaMetricsReporterMBean;
 import kafka.utils.VerifiableProperties;
 
 public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 	KafkaGraphiteMetricsReporterMBean {
 
-	static Logger LOG = Logger.getLogger(KafkaGraphiteMetricsReporter.class);
-	static String GRAPHITE_DEFAULT_HOST = "localhost";
-	static int GRAPHITE_DEFAULT_PORT = 2003;
-	static String GRAPHITE_DEFAULT_PREFIX = "kafka";
+	private static final Logger LOG = Logger.getLogger(KafkaGraphiteMetricsReporter.class);
+	private static final String GRAPHITE_DEFAULT_HOST = "localhost";
+	private static final int GRAPHITE_DEFAULT_PORT = 2003;
+	private static final String GRAPHITE_DEFAULT_PREFIX = "kafka";
 	
-	boolean initialized = false;
-	boolean running = false;
-	GraphiteReporter reporter = null;
-    String graphiteHost = GRAPHITE_DEFAULT_HOST;
-    int graphitePort = GRAPHITE_DEFAULT_PORT;
-    String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
-    MetricPredicate predicate = MetricPredicate.ALL;
+	private boolean initialized = false;
+	private boolean running = false;
+	private GraphiteReporter reporter = null;
+    private String graphiteHost = GRAPHITE_DEFAULT_HOST;
+    private int graphitePort = GRAPHITE_DEFAULT_PORT;
+    private String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
+    private MetricPredicate predicate = MetricPredicate.ALL;
 
 	@Override
 	public String getMBeanName() {
