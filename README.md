@@ -14,8 +14,9 @@ Install On Broker
 ------------
 
 1. Build the `kafka-graphite-1.0.0.jar` jar using `mvn package`.
-2. Add `kafka-graphite-1.0.0.jar` and `metrics-graphite-2.2.0.jar` to the `libs/` 
-   directory of your kafka broker installation
+   Hint: The jar will include the metrics-graphite dependency
+   which is not brought by Kafka.
+2. Add `kafka-graphite-1.0.0.jar` to the `libs/` directory of your kafka broker installation
 3. Configure the broker (see the configuration section below)
 4. Restart the broker
 
@@ -37,8 +38,3 @@ Here is a list of default properties used:
     # if you have many topics/partitions.
     kafka.graphite.metrics.exclude.regex=<not set>
 
-Usage As Lib
------------
-
-Simply build the jar and publish it to your maven internal repository (this 
-package is not published to any public repositories unfortunately).
