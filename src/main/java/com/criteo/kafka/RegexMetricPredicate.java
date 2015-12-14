@@ -24,10 +24,18 @@ import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricPredicate;
 
+/**
+ * Implementation of {@link MetricPredicate} which will <b>exclude<b/> metrics if they match
+ * the given regular expression.
+ */
 class RegexMetricPredicate implements MetricPredicate {
 
 	private final Pattern pattern;
 
+	/**
+	 * Constructor.
+	 * @param regex the regular expression to match the metric names, can not be {@code null}
+     */
 	public RegexMetricPredicate(String regex) {
 		pattern = Pattern.compile(regex);
 	}
