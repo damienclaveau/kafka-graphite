@@ -1,6 +1,8 @@
 Kafka Graphite Metrics Reporter
 ==============================
 
+[![Build Status](https://travis-ci.org/emetriq/kafka-graphite.svg)](https://travis-ci.org/emetriq/kafka-graphite)
+
 This is a simple reporter for kafka using the 
 [GraphiteReporter](http://metrics.codahale.com/manual/graphite/). It works with 
 kafka 0.8.x version.
