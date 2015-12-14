@@ -4,7 +4,7 @@ Kafka Graphite Metrics Reporter
 [![Build Status](https://travis-ci.org/emetriq/kafka-graphite.svg)](https://travis-ci.org/emetriq/kafka-graphite)
 
 This is a simple reporter for kafka using the 
-[GraphiteReporter](http://metrics.codahale.com/manual/graphite/). It works with 
+[GraphiteReporter](https://dropwizard.github.io/metrics/2.2.0/apidocs/com/yammer/metrics/reporting/GraphiteReporter.html). It works with
 kafka 0.8.x version.
 
 Big thanks to Maxime Brugidou from Criteo who did the initial commit of the Ganglia version,
