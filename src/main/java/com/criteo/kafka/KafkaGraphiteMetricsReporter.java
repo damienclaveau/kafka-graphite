@@ -51,7 +51,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
 
 	@Override
 	public String getMBeanName() {
-		return "kafka:type=com.criteo.kafka.KafkaGraphiteMetricsReporter";
+		return "kafka:type=" + KafkaGraphiteMetricsReporter.class.getName();
 	}
 
 	@Override
