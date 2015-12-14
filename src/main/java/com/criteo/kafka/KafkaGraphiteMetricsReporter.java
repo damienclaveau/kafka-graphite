@@ -21,7 +21,8 @@ package com.criteo.kafka;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.MetricPredicate;
@@ -31,10 +32,10 @@ import kafka.metrics.KafkaMetricsConfig;
 import kafka.metrics.KafkaMetricsReporter;
 import kafka.utils.VerifiableProperties;
 
-public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
-	KafkaGraphiteMetricsReporterMBean {
+public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, KafkaGraphiteMetricsReporterMBean {
 
-	private static final Logger LOG = Logger.getLogger(KafkaGraphiteMetricsReporter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(KafkaGraphiteMetricsReporter.class);
+
 	private static final String GRAPHITE_DEFAULT_HOST = "localhost";
 	private static final int GRAPHITE_DEFAULT_PORT = 2003;
 	private static final String GRAPHITE_DEFAULT_PREFIX = "kafka";
@@ -57,7 +58,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 		if (initialized && !running) {
 			reporter.start(pollingPeriodSecs, TimeUnit.SECONDS);
 			running = true;
-			LOG.info(String.format("Started Kafka Graphite metrics reporter with polling period %d seconds", pollingPeriodSecs));
+			LOG.info("Started Kafka Graphite metrics reporter with polling period {} seconds", pollingPeriodSecs);
 		}
 	}
 
@@ -90,7 +91,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             graphiteGroupPrefix = props.getString("kafka.graphite.metrics.group", GRAPHITE_DEFAULT_PREFIX);
             String regex = props.getString("kafka.graphite.metrics.exclude.regex", null);
 
-            LOG.debug("Initialize GraphiteReporter ["+graphiteHost+","+graphitePort+","+graphiteGroupPrefix+"]");
+            LOG.debug("Initialize GraphiteReporter [{},{},{}]", graphiteHost, graphitePort, graphiteGroupPrefix);
 
             if (regex != null) {
             	predicate = new RegexMetricPredicate(regex);
