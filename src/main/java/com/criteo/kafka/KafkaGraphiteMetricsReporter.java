@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.reporting.GraphiteReporter;
 
@@ -68,17 +69,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
 			reporter.shutdown();
 			running = false;
 			LOG.info("Stopped Kafka Graphite metrics reporter");
-            try {
-            	reporter = new GraphiteReporter(
-            			Metrics.defaultRegistry(),
-            			graphiteHost,
-            			graphitePort,
-            			graphiteGroupPrefix/*,
-            			predicate*/
-            			);
-            } catch (IOException e) {
-            	LOG.error("Unable to initialize GraphiteReporter", e);
-            }
+			reporter = buildGraphiteReporter();
 		}
 	}
 
@@ -94,24 +85,33 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
             LOG.debug("Initialize GraphiteReporter [{},{},{}]", graphiteHost, graphitePort, graphiteGroupPrefix);
 
             if (regex != null) {
+				LOG.debug("Using regex [{}] for GraphiteReporter", regex);
             	predicate = new RegexMetricPredicate(regex);
             }
-            try {
-            	reporter = new GraphiteReporter(
-            			Metrics.defaultRegistry(),
-            			graphiteHost,
-            			graphitePort,
-            			graphiteGroupPrefix/*,
-            			predicate*/
-            			);
-            } catch (IOException e) {
-            	LOG.error("Unable to initialize GraphiteReporter", e);
-            }
+			reporter = buildGraphiteReporter();
+
             if (props.getBoolean("kafka.graphite.metrics.reporter.enabled", false)) {
             	initialized = true;
             	startReporter(metricsConfig.pollingIntervalSecs());
                 LOG.debug("GraphiteReporter started.");
             }
         }
+	}
+
+
+	private GraphiteReporter buildGraphiteReporter() {
+		GraphiteReporter graphiteReporter = null;
+		try {
+			graphiteReporter = new GraphiteReporter(
+					Metrics.defaultRegistry(),
+					graphiteGroupPrefix,
+					predicate,
+					new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
+					Clock.defaultClock()
+			);
+		} catch (IOException e) {
+			LOG.error("Unable to initialize GraphiteReporter", e);
+		}
+		return graphiteReporter;
 	}
 }

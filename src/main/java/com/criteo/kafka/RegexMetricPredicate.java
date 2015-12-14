@@ -26,18 +26,15 @@ import com.yammer.metrics.core.MetricPredicate;
 
 class RegexMetricPredicate implements MetricPredicate {
 
-	private Pattern pattern = null;
-	//static Logger LOG = Logger.getLogger(RegexMetricPredicate.class);
-	
+	private final Pattern pattern;
+
 	public RegexMetricPredicate(String regex) {
 		pattern = Pattern.compile(regex);
 	}
 	
 	@Override
 	public boolean matches(MetricName name, Metric metric) {
-		boolean ok = !pattern.matcher(name.getName()).matches();
-		//LOG.info(String.format("name: %s - %s", name.getName(), ok));
-		return ok;
+		return !pattern.matcher(name.getName()).matches();
 	}
 
 }
