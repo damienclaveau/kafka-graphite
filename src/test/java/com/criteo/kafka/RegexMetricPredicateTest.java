@@ -45,11 +45,6 @@ public class RegexMetricPredicateTest {
         assertTrue(predicate.matches(buildMetricName("foo.bar"), null));
     }
 
-
-
-
-
-
     private MetricName buildMetricName(String name) {
         return new  MetricName("group", "type", name, "scope", "mBeanName");
     }

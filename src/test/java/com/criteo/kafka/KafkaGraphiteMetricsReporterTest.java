@@ -23,6 +23,8 @@ import org.junit.Test;
 
 import kafka.utils.VerifiableProperties;
 
+import java.util.Properties;
+
 public class KafkaGraphiteMetricsReporterTest {
 
 
@@ -31,6 +33,21 @@ public class KafkaGraphiteMetricsReporterTest {
         KafkaGraphiteMetricsReporter reporter = new KafkaGraphiteMetricsReporter();
         reporter.init(new VerifiableProperties());
     }
+
+    @Test
+    public void initStartStopWithPropertiesSet() {
+        KafkaGraphiteMetricsReporter reporter = new KafkaGraphiteMetricsReporter();
+        reporter.init(new VerifiableProperties());
+        Properties properties = new Properties();
+        properties.setProperty("kafka.graphite.metrics.exclude.regex", "xyz.*");
+        properties.setProperty("kafka.graphite.metrics.reporter.enabled", "true");
+
+        reporter.init(new VerifiableProperties(properties));
+
+        reporter.startReporter(1l);
+        reporter.stopReporter();
+    }
+
 
     @Test
     public void getMBeanName() {
