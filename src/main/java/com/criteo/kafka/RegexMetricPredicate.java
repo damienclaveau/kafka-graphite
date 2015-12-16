@@ -30,19 +30,20 @@ import com.yammer.metrics.core.MetricPredicate;
  */
 class RegexMetricPredicate implements MetricPredicate {
 
-	private final Pattern pattern;
+    private final Pattern pattern;
 
-	/**
-	 * Constructor.
-	 * @param regex the regular expression to match the metric names, can not be {@code null}
+    /**
+     * Constructor.
+     *
+     * @param regex the regular expression to match the metric names, can not be {@code null}
      */
-	public RegexMetricPredicate(String regex) {
-		pattern = Pattern.compile(regex);
-	}
-	
-	@Override
-	public boolean matches(MetricName name, Metric metric) {
-		return !pattern.matcher(name.getName()).matches();
-	}
+    public RegexMetricPredicate(String regex) {
+        pattern = Pattern.compile(regex);
+    }
+
+    @Override
+    public boolean matches(MetricName name, Metric metric) {
+        return !pattern.matcher(name.getName()).matches();
+    }
 
 }
