@@ -37,7 +37,6 @@ public class KafkaGraphiteMetricsReporterTest {
     @Test
     public void initStartStopWithPropertiesSet() {
         KafkaGraphiteMetricsReporter reporter = new KafkaGraphiteMetricsReporter();
-        reporter.init(new VerifiableProperties());
         Properties properties = new Properties();
         properties.setProperty("kafka.graphite.metrics.exclude.regex", "xyz.*");
         properties.setProperty("kafka.graphite.metrics.reporter.enabled", "true");
