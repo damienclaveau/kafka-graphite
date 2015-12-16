@@ -35,48 +35,48 @@ import kafka.utils.VerifiableProperties;
 
 public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, KafkaGraphiteMetricsReporterMBean {
 
-	private static final Logger LOG = LoggerFactory.getLogger(KafkaGraphiteMetricsReporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaGraphiteMetricsReporter.class);
 
-	private static final String GRAPHITE_DEFAULT_HOST = "localhost";
-	private static final int GRAPHITE_DEFAULT_PORT = 2003;
-	private static final String GRAPHITE_DEFAULT_PREFIX = "kafka";
-	
-	private boolean initialized = false;
-	private boolean running = false;
-	private GraphiteReporter reporter = null;
+    private static final String GRAPHITE_DEFAULT_HOST = "localhost";
+    private static final int GRAPHITE_DEFAULT_PORT = 2003;
+    private static final String GRAPHITE_DEFAULT_PREFIX = "kafka";
+
+    private boolean initialized = false;
+    private boolean running = false;
+    private GraphiteReporter reporter = null;
     private String graphiteHost = GRAPHITE_DEFAULT_HOST;
     private int graphitePort = GRAPHITE_DEFAULT_PORT;
     private String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
     private MetricPredicate predicate = MetricPredicate.ALL;
 
-	@Override
-	public String getMBeanName() {
-		return "kafka:type=" + KafkaGraphiteMetricsReporter.class.getName();
-	}
+    @Override
+    public String getMBeanName() {
+        return "kafka:type=" + KafkaGraphiteMetricsReporter.class.getName();
+    }
 
-	@Override
-	public synchronized void startReporter(long pollingPeriodSecs) {
-		if (initialized && !running) {
-			reporter.start(pollingPeriodSecs, TimeUnit.SECONDS);
-			running = true;
-			LOG.info("Started Kafka Graphite metrics reporter with polling period {} seconds", pollingPeriodSecs);
-		}
-	}
+    @Override
+    public synchronized void startReporter(long pollingPeriodSecs) {
+        if (initialized && !running) {
+            reporter.start(pollingPeriodSecs, TimeUnit.SECONDS);
+            running = true;
+            LOG.info("Started Kafka Graphite metrics reporter with polling period {} seconds", pollingPeriodSecs);
+        }
+    }
 
-	@Override
-	public synchronized void stopReporter() {
-		if (initialized && running) {
-			reporter.shutdown();
-			running = false;
-			LOG.info("Stopped Kafka Graphite metrics reporter");
-			reporter = buildGraphiteReporter();
-		}
-	}
+    @Override
+    public synchronized void stopReporter() {
+        if (initialized && running) {
+            reporter.shutdown();
+            running = false;
+            LOG.info("Stopped Kafka Graphite metrics reporter");
+            reporter = buildGraphiteReporter();
+        }
+    }
 
-	@Override
-	public synchronized void init(VerifiableProperties props) {
-		if (!initialized) {
-			KafkaMetricsConfig metricsConfig = new KafkaMetricsConfig(props);
+    @Override
+    public synchronized void init(VerifiableProperties props) {
+        if (!initialized) {
+            KafkaMetricsConfig metricsConfig = new KafkaMetricsConfig(props);
             graphiteHost = props.getString("kafka.graphite.metrics.host", GRAPHITE_DEFAULT_HOST);
             graphitePort = props.getInt("kafka.graphite.metrics.port", GRAPHITE_DEFAULT_PORT);
             graphiteGroupPrefix = props.getString("kafka.graphite.metrics.group", GRAPHITE_DEFAULT_PREFIX);
@@ -85,33 +85,33 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
             LOG.debug("Initialize GraphiteReporter [{},{},{}]", graphiteHost, graphitePort, graphiteGroupPrefix);
 
             if (regex != null) {
-				LOG.debug("Using regex [{}] for GraphiteReporter", regex);
-            	predicate = new RegexMetricPredicate(regex);
+                LOG.debug("Using regex [{}] for GraphiteReporter", regex);
+                predicate = new RegexMetricPredicate(regex);
             }
-			reporter = buildGraphiteReporter();
+            reporter = buildGraphiteReporter();
 
             if (props.getBoolean("kafka.graphite.metrics.reporter.enabled", false)) {
-            	initialized = true;
-            	startReporter(metricsConfig.pollingIntervalSecs());
+                initialized = true;
+                startReporter(metricsConfig.pollingIntervalSecs());
                 LOG.debug("GraphiteReporter started.");
             }
         }
-	}
+    }
 
 
-	private GraphiteReporter buildGraphiteReporter() {
-		GraphiteReporter graphiteReporter = null;
-		try {
-			graphiteReporter = new GraphiteReporter(
-					Metrics.defaultRegistry(),
-					graphiteGroupPrefix,
-					predicate,
-					new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
-					Clock.defaultClock()
-			);
-		} catch (IOException e) {
-			LOG.error("Unable to initialize GraphiteReporter", e);
-		}
-		return graphiteReporter;
-	}
+    private GraphiteReporter buildGraphiteReporter() {
+        GraphiteReporter graphiteReporter = null;
+        try {
+            graphiteReporter = new GraphiteReporter(
+                    Metrics.defaultRegistry(),
+                    graphiteGroupPrefix,
+                    predicate,
+                    new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
+                    Clock.defaultClock()
+            );
+        } catch (IOException e) {
+            LOG.error("Unable to initialize GraphiteReporter", e);
+        }
+        return graphiteReporter;
+    }
 }
