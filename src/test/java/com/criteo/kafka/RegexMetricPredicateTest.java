@@ -33,6 +33,22 @@ public class RegexMetricPredicateTest {
          new RegexMetricPredicate(null);
     }
 
+    @Test
+    public void alwaysExcludeAppVersion_NoRegEx() {
+        MetricPredicate predicate = new RegexMetricPredicate();
+
+        assertFalse(predicate.matches(new MetricName("kafka.common", "AppInfo", "Version", "scope", "mBeanName"), null));
+        assertTrue(predicate.matches(new MetricName("kafka.common", "AppInfo", "SomethingElse", "scope", "mBeanName"), null));
+    }
+
+    @Test
+    public void alwaysExcludeAppVersion_WithRegEx() {
+        MetricPredicate predicate = new RegexMetricPredicate("group.type.foobar.*");
+
+        assertFalse(predicate.matches(new MetricName("kafka.common", "AppInfo", "Version", "scope", "mBeanName"), null));
+        assertTrue(predicate.matches(new MetricName("kafka.common", "AppInfo", "SomethingElse", "scope", "mBeanName"), null));
+     }
+
 
     @Test
     public void matches() {
