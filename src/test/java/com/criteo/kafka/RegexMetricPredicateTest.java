@@ -34,7 +34,7 @@ public class RegexMetricPredicateTest {
 
     @Test
     public void matches() {
-        MetricPredicate predicate = new RegexMetricPredicate("foobar.*");
+        MetricPredicate predicate = new RegexMetricPredicate("group.type.foobar.*");
 
         assertFalse(predicate.matches(buildMetricName("foobar.count"), null));
         assertFalse(predicate.matches(buildMetricName("foobar.rate"), null));
@@ -46,6 +46,7 @@ public class RegexMetricPredicateTest {
     }
 
     private MetricName buildMetricName(String name) {
-        return new  MetricName("group", "type", name, "scope", "mBeanName");
+        return new MetricName("group", "type", name, "scope", "mBeanName");
     }
+
 }

@@ -43,7 +43,7 @@ class RegexMetricPredicate implements MetricPredicate {
 
     @Override
     public boolean matches(MetricName name, Metric metric) {
-        return !pattern.matcher(name.getName()).matches();
+        return !pattern.matcher(String.format("%s.%s.%s", name.getGroup(), name.getType(), name.getName())).matches();
     }
 
 }
