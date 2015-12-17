@@ -18,7 +18,9 @@
 
 package com.criteo.kafka;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 import com.yammer.metrics.core.MetricName;
@@ -31,10 +33,26 @@ public class RegexMetricPredicateTest {
          new RegexMetricPredicate(null);
     }
 
+    @Test
+    public void alwaysExcludeAppVersion_NoRegEx() {
+        MetricPredicate predicate = new RegexMetricPredicate();
+
+        assertFalse(predicate.matches(new MetricName("kafka.common", "AppInfo", "Version", "scope", "mBeanName"), null));
+        assertTrue(predicate.matches(new MetricName("kafka.common", "AppInfo", "SomethingElse", "scope", "mBeanName"), null));
+    }
+
+    @Test
+    public void alwaysExcludeAppVersion_WithRegEx() {
+        MetricPredicate predicate = new RegexMetricPredicate("group.type.foobar.*");
+
+        assertFalse(predicate.matches(new MetricName("kafka.common", "AppInfo", "Version", "scope", "mBeanName"), null));
+        assertTrue(predicate.matches(new MetricName("kafka.common", "AppInfo", "SomethingElse", "scope", "mBeanName"), null));
+     }
+
 
     @Test
     public void matches() {
-        MetricPredicate predicate = new RegexMetricPredicate("foobar.*");
+        MetricPredicate predicate = new RegexMetricPredicate("group.type.foobar.*");
 
         assertFalse(predicate.matches(buildMetricName("foobar.count"), null));
         assertFalse(predicate.matches(buildMetricName("foobar.rate"), null));
@@ -46,6 +64,7 @@ public class RegexMetricPredicateTest {
     }
 
     private MetricName buildMetricName(String name) {
-        return new  MetricName("group", "type", name, "scope", "mBeanName");
+        return new MetricName("group", "type", name, "scope", "mBeanName");
     }
+
 }

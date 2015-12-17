@@ -47,7 +47,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
     private String graphiteHost = GRAPHITE_DEFAULT_HOST;
     private int graphitePort = GRAPHITE_DEFAULT_PORT;
     private String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
-    private MetricPredicate predicate = MetricPredicate.ALL;
+    private MetricPredicate predicate = new RegexMetricPredicate();
 
     @Override
     public String getMBeanName() {

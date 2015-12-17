@@ -26,11 +26,21 @@ import com.yammer.metrics.core.MetricPredicate;
 
 /**
  * Implementation of {@link MetricPredicate} which will <b>exclude<b/> metrics if they match
- * the given regular expression.
+ * the given regular expression.<br>
+ * It will also exclude the {@code kafka.common.AppInfo.Version} metric which causes warnings in graphite because of the invalid value.
  */
 class RegexMetricPredicate implements MetricPredicate {
 
+    private static final Pattern APPVERSION_PATTERN = Pattern.compile("kafka.common.AppInfo.Version");
+
     private final Pattern pattern;
+
+    /**
+     * Default constructor which just excludes the metric containing Kafka's version
+     */
+    public RegexMetricPredicate() {
+        pattern = null;
+    }
 
     /**
      * Constructor.
@@ -43,7 +53,14 @@ class RegexMetricPredicate implements MetricPredicate {
 
     @Override
     public boolean matches(MetricName name, Metric metric) {
-        return !pattern.matcher(name.getName()).matches();
+        String metricName = String.format("%s.%s.%s", name.getGroup(), name.getType(), name.getName());
+        boolean isNotVersionMetric = !APPVERSION_PATTERN.matcher(metricName).matches();
+
+        if (isNotVersionMetric && pattern != null) {
+            return !pattern.matcher(metricName).matches();
+        } else {
+            return isNotVersionMetric;
+        }
     }
 
 }

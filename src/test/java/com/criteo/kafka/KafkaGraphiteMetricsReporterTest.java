@@ -18,12 +18,13 @@
 
 package com.criteo.kafka;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Properties;
+
 import org.junit.Test;
 
 import kafka.utils.VerifiableProperties;
-
-import java.util.Properties;
 
 public class KafkaGraphiteMetricsReporterTest {
 
@@ -43,7 +44,7 @@ public class KafkaGraphiteMetricsReporterTest {
 
         reporter.init(new VerifiableProperties(properties));
 
-        reporter.startReporter(1l);
+        reporter.startReporter(1L);
         reporter.stopReporter();
     }
 
