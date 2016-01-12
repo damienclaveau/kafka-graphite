@@ -47,7 +47,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
     private String graphiteHost = GRAPHITE_DEFAULT_HOST;
     private int graphitePort = GRAPHITE_DEFAULT_PORT;
     private String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
-    private MetricPredicate predicate = new RegexMetricPredicate();
+    private MetricPredicate predicate = new FilterMetricPredicate();
 
     @Override
     public String getMBeanName() {
@@ -86,7 +86,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
 
             if (regex != null) {
                 LOG.debug("Using regex [{}] for GraphiteReporter", regex);
-                predicate = new RegexMetricPredicate(regex);
+                predicate = new FilterMetricPredicate(regex);
             }
             reporter = buildGraphiteReporter();
 

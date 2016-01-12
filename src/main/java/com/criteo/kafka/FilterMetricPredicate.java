@@ -20,16 +20,26 @@ package com.criteo.kafka;
 
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Metric;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.core.MetricPredicate;
+import com.yammer.metrics.core.MetricProcessor;
 
 /**
  * Implementation of {@link MetricPredicate} which will <b>exclude<b/> metrics if they match
  * the given regular expression.<br>
  * It will also exclude the {@code kafka.common.AppInfo.Version} metric which causes warnings in graphite because of the invalid value.
+ * And it will exclude and remove all Gauges which are no longer available on the broker.
  */
-class RegexMetricPredicate implements MetricPredicate {
+class FilterMetricPredicate implements MetricPredicate {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FilterMetricPredicate.class);
+
+    private static final MetricProcessor metricProcessor = new ValidatingMetricProcessor();
 
     private static final Pattern APPVERSION_PATTERN = Pattern.compile("kafka.common.AppInfo.Version");
 
@@ -38,7 +48,7 @@ class RegexMetricPredicate implements MetricPredicate {
     /**
      * Default constructor which just excludes the metric containing Kafka's version
      */
-    public RegexMetricPredicate() {
+    public FilterMetricPredicate() {
         pattern = null;
     }
 
@@ -47,20 +57,41 @@ class RegexMetricPredicate implements MetricPredicate {
      *
      * @param regex the regular expression to match the metric names, can not be {@code null}
      */
-    public RegexMetricPredicate(String regex) {
+    public FilterMetricPredicate(String regex) {
         pattern = Pattern.compile(regex);
     }
 
     @Override
     public boolean matches(MetricName name, Metric metric) {
         String metricName = String.format("%s.%s.%s", name.getGroup(), name.getType(), name.getName());
-        boolean isNotVersionMetric = !APPVERSION_PATTERN.matcher(metricName).matches();
+        boolean isVersionMetric = APPVERSION_PATTERN.matcher(metricName).matches();
 
-        if (isNotVersionMetric && pattern != null) {
-            return !pattern.matcher(metricName).matches();
-        } else {
-            return isNotVersionMetric;
+        if (isVersionMetric || cleanInvalidGauge(name, metric, metricName)) {
+            return false;
         }
+
+        if (pattern != null) {
+            return !pattern.matcher(metricName).matches();
+        }
+
+        return true;
+    }
+
+    /**
+     * Filter gauges that should have been deleted, ugly workaround for KAFKA-1866 with Kafka 0.8.x
+     * @return {@code false} if gauge is not cleaned.
+     */
+    private boolean cleanInvalidGauge(MetricName name, Metric metric, String metricName) {
+        try {
+            metric.processWith(metricProcessor, name, null);
+        } catch (InvalidGaugeException ex) {
+            LOGGER.info("Deleting metric {} from registry", metricName);
+            Metrics.defaultRegistry().removeMetric(name);
+            return true;
+        } catch (Exception ex) {
+            LOGGER.error("Caught an Exception while processing metric " + metricName, ex);
+        }
+        return false;
     }
 
 }
