@@ -13,10 +13,10 @@ available here https://github.com/criteo/kafka-ganglia
 Install On Broker
 ------------
 
-1. Build the `kafka-graphite-1.0.0.jar` jar using `mvn package`.
+1. Build the `kafka-graphite-1.0.2.jar` jar using `mvn package` or download it from the releases.
    Hint: The jar will include the metrics-graphite dependency
    which is not brought by Kafka.
-2. Add `kafka-graphite-1.0.0.jar` to the `libs/` directory of your kafka broker installation
+2. Add `kafka-graphite-1.0.2.jar` to the `libs/` directory of your kafka broker installation
 3. Configure the broker (see the configuration section below)
 4. Restart the broker
 
@@ -38,3 +38,13 @@ Here is a list of default properties used:
     # if you have many topics/partitions.
     kafka.graphite.metrics.exclude.regex=<not set>
 
+
+Known Issues
+----------
+
+With Kafka  `<= 0.8.2.2` there is an issue if topics get deleted or partions are moved between brokers.
+The metrics are not get deleted in this case and because they are implemented as a `Gauge`, a `NoSuchElementException`
+is thrown when the metrics are reported.
+
+There is already a fix for this, see [KAFKA-1866](https://issues.apache.org/jira/browse/KAFKA-1866) but it did not make
+it into an 0.8.x release. Because of this we implemented a workaround for this within the `FilterMetricsPredicate`.
