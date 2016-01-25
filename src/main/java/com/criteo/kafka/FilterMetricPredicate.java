@@ -63,7 +63,8 @@ class FilterMetricPredicate implements MetricPredicate {
 
     @Override
     public boolean matches(MetricName name, Metric metric) {
-        String metricName = String.format("%s.%s.%s", name.getGroup(), name.getType(), name.getName());
+        String metricName = sanitizeName(name);
+
         boolean isVersionMetric = APPVERSION_PATTERN.matcher(metricName).matches();
 
         if (isVersionMetric || cleanInvalidGauge(name, metric, metricName)) {
@@ -92,6 +93,22 @@ class FilterMetricPredicate implements MetricPredicate {
             LOGGER.error("Caught an Exception while processing metric " + metricName, ex);
         }
         return false;
+    }
+
+
+    // same as in GraphiteReporter
+    // the scope is needed to support for example the metrics like: kafka.server.BrokerTopicMetrics.topic.TOPICNAME.BytesOutPerSec
+    private String sanitizeName(MetricName name) {
+        final StringBuilder sb = new StringBuilder()
+                .append(name.getGroup())
+                .append('.')
+                .append(name.getType())
+                .append('.');
+        if (name.hasScope()) {
+            sb.append(name.getScope())
+                    .append('.');
+        }
+        return sb.append(name.getName()).toString();
     }
 
 }

@@ -60,16 +60,16 @@ public class FilterMetricPredicateTest {
     public void alwaysExcludeAppVersion_NoRegEx() {
         MetricPredicate predicate = new FilterMetricPredicate();
 
-        assertFalse(predicate.matches(new MetricName("kafka.common", "AppInfo", "Version", "scope", "mBeanName"), metricMock));
-        assertTrue(predicate.matches(new MetricName("kafka.common", "AppInfo", "SomethingElse", "scope", "mBeanName"), metricMock));
+        assertFalse(predicate.matches(new MetricName("kafka.common", "AppInfo", "Version", null, "mBeanName"), metricMock));
+        assertTrue(predicate.matches(new MetricName("kafka.common", "AppInfo", "SomethingElse", null, "mBeanName"), metricMock));
     }
 
     @Test
     public void alwaysExcludeAppVersion_WithRegEx() {
         MetricPredicate predicate = new FilterMetricPredicate("group.type.foobar.*");
 
-        assertFalse(predicate.matches(new MetricName("kafka.common", "AppInfo", "Version", "scope", "mBeanName"), metricMock));
-        assertTrue(predicate.matches(new MetricName("kafka.common", "AppInfo", "SomethingElse", "scope", "mBeanName"), metricMock));
+        assertFalse(predicate.matches(new MetricName("kafka.common", "AppInfo", "Version", null, "mBeanName"), metricMock));
+        assertTrue(predicate.matches(new MetricName("kafka.common", "AppInfo", "SomethingElse", null, "mBeanName"), metricMock));
      }
 
     @Test
@@ -122,10 +122,9 @@ public class FilterMetricPredicateTest {
         assertEquals(Metrics.defaultRegistry().allMetrics().get(metricName), gauge);
     }
 
-
     @Test
     public void matches() {
-        MetricPredicate predicate = new FilterMetricPredicate("group.type.foobar.*");
+        MetricPredicate predicate = new FilterMetricPredicate("group.type.scope.foobar.*");
 
         assertFalse(predicate.matches(buildMetricName("foobar.count"), metricMock));
         assertFalse(predicate.matches(buildMetricName("foobar.rate"), metricMock));
