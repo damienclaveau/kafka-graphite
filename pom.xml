@@ -7,7 +7,7 @@
   <groupId>de.emetriq.kafka</groupId>
   <artifactId>kafka-graphite</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <name>Kafka metrics output to Graphite</name>
   <url>https://github.com/emetriq/kafka-graphite/</url>
 
