@@ -21,34 +21,30 @@ package com.criteo.kafka;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
+import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricPredicate;
 import com.yammer.metrics.reporting.GraphiteReporter;
 
 import kafka.metrics.KafkaMetricsConfig;
 import kafka.metrics.KafkaMetricsReporter;
-import kafka.metrics.KafkaMetricsReporterMBean;
 import kafka.utils.VerifiableProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
-	KafkaGraphiteMetricsReporterMBean {
-
-	static Logger LOG = Logger.getLogger(KafkaGraphiteMetricsReporter.class);
-	static String GRAPHITE_DEFAULT_HOST = "localhost";
-	static int GRAPHITE_DEFAULT_PORT = 2003;
-	static String GRAPHITE_DEFAULT_PREFIX = "kafka";
+public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, KafkaGraphiteMetricsReporterMBean {
+	private static final Logger LOG = LoggerFactory.getLogger(KafkaGraphiteMetricsReporter.class);
+	private static final String GRAPHITE_DEFAULT_HOST = "localhost";
+	private static final int GRAPHITE_DEFAULT_PORT = 2003;
+	private static final String GRAPHITE_DEFAULT_PREFIX = "kafka";
 	
-	boolean initialized = false;
-	boolean running = false;
-	GraphiteReporter reporter = null;
-    String graphiteHost = GRAPHITE_DEFAULT_HOST;
-    int graphitePort = GRAPHITE_DEFAULT_PORT;
-    String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
-    MetricPredicate predicate = MetricPredicate.ALL;
+	private boolean initialized = false;
+	private boolean running = false;
+	private GraphiteReporter reporter = null;
+    private String graphiteHost = GRAPHITE_DEFAULT_HOST;
+    private int graphitePort = GRAPHITE_DEFAULT_PORT;
+    private String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
+    private MetricPredicate predicate = MetricPredicate.ALL;
 
 	@Override
 	public String getMBeanName() {
@@ -60,7 +56,7 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 		if (initialized && !running) {
 			reporter.start(pollingPeriodSecs, TimeUnit.SECONDS);
 			running = true;
-			LOG.info(String.format("Started Kafka Graphite metrics reporter with polling period %d seconds", pollingPeriodSecs));
+			LOG.info("Started Kafka Graphite metrics reporter with polling period {} seconds", pollingPeriodSecs);
 		}
 	}
 
@@ -72,12 +68,12 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
 			LOG.info("Stopped Kafka Graphite metrics reporter");
             try {
             	reporter = new GraphiteReporter(
-            			Metrics.defaultRegistry(),
-            			graphiteHost,
-            			graphitePort,
-            			graphiteGroupPrefix/*,
-            			predicate*/
-            			);
+					Metrics.defaultRegistry(),
+					graphiteGroupPrefix,
+					predicate,
+					new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
+					Clock.defaultClock()
+				);
             } catch (IOException e) {
             	LOG.error("Unable to initialize GraphiteReporter", e);
             }
@@ -93,19 +89,19 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter,
             graphiteGroupPrefix = props.getString("kafka.graphite.metrics.group", GRAPHITE_DEFAULT_PREFIX);
             String regex = props.getString("kafka.graphite.metrics.exclude.regex", null);
 
-            LOG.debug("Initialize GraphiteReporter ["+graphiteHost+","+graphitePort+","+graphiteGroupPrefix+"]");
+            LOG.debug("Initialize GraphiteReporter [{}, {}, {}]", graphiteHost, graphitePort, graphiteGroupPrefix);
 
             if (regex != null) {
             	predicate = new RegexMetricPredicate(regex);
             }
             try {
             	reporter = new GraphiteReporter(
-            			Metrics.defaultRegistry(),
-            			graphiteHost,
-            			graphitePort,
-            			graphiteGroupPrefix/*,
-            			predicate*/
-            			);
+					Metrics.defaultRegistry(),
+					graphiteGroupPrefix,
+					predicate,
+					new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
+					Clock.defaultClock()
+				);
             } catch (IOException e) {
             	LOG.error("Unable to initialize GraphiteReporter", e);
             }
