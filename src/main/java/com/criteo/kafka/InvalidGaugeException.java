@@ -18,8 +18,12 @@
 
 package com.criteo.kafka;
 
-import kafka.metrics.KafkaMetricsReporterMBean;
+/**
+ * Indicates a Gauge that should be removed.
+ */
+public class InvalidGaugeException extends Exception {
 
-public interface KafkaGraphiteMetricsReporterMBean extends KafkaMetricsReporterMBean {
-
+    public InvalidGaugeException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
