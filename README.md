@@ -28,7 +28,7 @@ Edit the `server.properties` file of your installation, activate the reporter by
 Here is a list of default properties used:
 
     kafka.graphite.metrics.host=localhost
-    kafka.graphite.metrics.port=8649
+    kafka.graphite.metrics.port=2003
     kafka.graphite.metrics.group=kafka
     # This can be use to exclude some metrics from graphite 
     # since kafka has quite a lot of metrics, it is useful
