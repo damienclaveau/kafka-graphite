@@ -29,7 +29,7 @@ import com.yammer.metrics.core.MetricPredicate;
 public class RegexMetricPredicate implements MetricPredicate {
 
 	Pattern pattern = null;
-	//static Logger LOG = Logger.getLogger(RegexMetricPredicate.class);
+	static Logger LOG = Logger.getLogger(RegexMetricPredicate.class);
 	
 	public RegexMetricPredicate(String regex) {
 		pattern = Pattern.compile(regex);
@@ -37,8 +37,8 @@ public class RegexMetricPredicate implements MetricPredicate {
 	
 	@Override
 	public boolean matches(MetricName name, Metric metric) {
-		boolean ok = !pattern.matcher(name.getName()).matches();
-		//LOG.info(String.format("name: %s - %s", name.getName(), ok));
+		boolean ok = !pattern.matcher(String.format("%s.%s.%s", name.getGroup(), name.getType(), name.getName())).matches();
+		// LOG.warn(String.format("name: %s.%s.%s - %s", name.getGroup(), name.getType(), name.getName(), ok));
 		return ok;
 	}
 
