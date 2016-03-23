@@ -38,6 +38,27 @@ Here is a list of default properties used:
     # if you have many topics/partitions.
     kafka.graphite.metrics.exclude.regex=<not set>
 
+    # Each metric provides multiple dimensions: min, max, meanRate, etc
+    # This might be too much data.
+    # It is possible to disable some metric dimensions with the following properties:
+    # By default all dimensions are enabled. Only the unwanted dimensions have to be configured
+    kafka.graphite.dimension.enabled.count=false
+    kafka.graphite.dimension.enabled.meanRate=false
+    kafka.graphite.dimension.enabled.rate1m=false
+    kafka.graphite.dimension.enabled.rate5m=false
+    kafka.graphite.dimension.enabled.rate15m=false
+    kafka.graphite.dimension.enabled.min=false
+    kafka.graphite.dimension.enabled.max=false
+    kafka.graphite.dimension.enabled.mean=false
+    kafka.graphite.dimension.enabled.sum=false
+    kafka.graphite.dimension.enabled.stddev=false
+    kafka.graphite.dimension.enabled.median=false
+    kafka.graphite.dimension.enabled.p75=false
+    kafka.graphite.dimension.enabled.p95=false
+    kafka.graphite.dimension.enabled.p98=false
+    kafka.graphite.dimension.enabled.p99=false
+    kafka.graphite.dimension.enabled.p999=false
+
 
 Known Issues
 ----------

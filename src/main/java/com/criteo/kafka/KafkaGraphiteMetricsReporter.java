@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Clock;
 import com.yammer.metrics.core.MetricPredicate;
-import com.yammer.metrics.reporting.GraphiteReporter;
+import java.util.EnumSet;
 
 import kafka.metrics.KafkaMetricsConfig;
 import kafka.metrics.KafkaMetricsReporter;
@@ -43,11 +43,12 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
 
     private boolean initialized = false;
     private boolean running = false;
-    private GraphiteReporter reporter = null;
+    private FilteredGraphiteReporter reporter = null;
     private String graphiteHost = GRAPHITE_DEFAULT_HOST;
     private int graphitePort = GRAPHITE_DEFAULT_PORT;
-    private String graphiteGroupPrefix = GRAPHITE_DEFAULT_PREFIX;
-    private MetricPredicate predicate = new FilterMetricPredicate();
+    private String metricPrefix = GRAPHITE_DEFAULT_PREFIX;
+    private MetricPredicate metricPredicate = new FilterMetricPredicate();
+    private EnumSet<Dimension> metricDimensions;
 
     @Override
     public String getMBeanName() {
@@ -79,14 +80,15 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
             KafkaMetricsConfig metricsConfig = new KafkaMetricsConfig(props);
             graphiteHost = props.getString("kafka.graphite.metrics.host", GRAPHITE_DEFAULT_HOST);
             graphitePort = props.getInt("kafka.graphite.metrics.port", GRAPHITE_DEFAULT_PORT);
-            graphiteGroupPrefix = props.getString("kafka.graphite.metrics.group", GRAPHITE_DEFAULT_PREFIX);
-            String regex = props.getString("kafka.graphite.metrics.exclude.regex", null);
+            metricPrefix = props.getString("kafka.graphite.metrics.group", GRAPHITE_DEFAULT_PREFIX);
+            String excludeRegex = props.getString("kafka.graphite.metrics.exclude.regex", null);
+            metricDimensions = Dimension.fromProperties(props.props(), "kafka.graphite.dimension.enabled.");
+    
+            LOG.debug("Initialize GraphiteReporter [{},{},{}]", graphiteHost, graphitePort, metricPrefix);
 
-            LOG.debug("Initialize GraphiteReporter [{},{},{}]", graphiteHost, graphitePort, graphiteGroupPrefix);
-
-            if (regex != null) {
-                LOG.debug("Using regex [{}] for GraphiteReporter", regex);
-                predicate = new FilterMetricPredicate(regex);
+            if (excludeRegex != null) {
+                LOG.debug("Using regex [{}] for GraphiteReporter", excludeRegex);
+                metricPredicate = new FilterMetricPredicate(excludeRegex);
             }
             reporter = buildGraphiteReporter();
 
@@ -99,14 +101,15 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
     }
 
 
-    private GraphiteReporter buildGraphiteReporter() {
-        GraphiteReporter graphiteReporter = null;
+    private FilteredGraphiteReporter buildGraphiteReporter() {
+        FilteredGraphiteReporter graphiteReporter = null;
         try {
-            graphiteReporter = new GraphiteReporter(
+            graphiteReporter = new FilteredGraphiteReporter(
                     Metrics.defaultRegistry(),
-                    graphiteGroupPrefix,
-                    predicate,
-                    new GraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
+                    metricPrefix,
+                    metricPredicate,
+                    metricDimensions,
+                    new FilteredGraphiteReporter.DefaultSocketProvider(graphiteHost, graphitePort),
                     Clock.defaultClock()
             );
         } catch (IOException e) {
