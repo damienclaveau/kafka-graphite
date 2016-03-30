@@ -25,8 +25,12 @@ Configuration
 
 Edit the `server.properties` file of your installation, activate the reporter by setting:
 
-    kafka.metrics.reporters=com.criteo.kafka.KafkaGraphiteMetricsReporter[,kafka.metrics.KafkaCSVMetricsReporter[,....]]
+    kafka.metrics.reporters=com.criteo.kafka.KafkaGraphiteMetricsReporter
     kafka.graphite.metrics.reporter.enabled=true
+
+You may also specify multiple comma-separated reporter classes for the `kafka.metrics.reporters` property:
+
+    kafka.metrics.reporters=com.criteo.kafka.KafkaGraphiteMetricsReporter,kafka.metrics.KafkaCSVMetricsReporter[,....]
 
 Here is a list of default properties used:
 
