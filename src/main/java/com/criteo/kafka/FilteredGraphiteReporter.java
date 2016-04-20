@@ -54,7 +54,7 @@ public class FilteredGraphiteReporter extends GraphiteReporter {
     public FilteredGraphiteReporter(MetricsRegistry metricsRegistry, String prefix, MetricPredicate predicate, EnumSet<Dimension> dimensions, SocketProvider socketProvider, Clock clock) throws IOException {    
         super(metricsRegistry, prefix, predicate, socketProvider, clock);
         this.dimensions = dimensions;
-        LOGGER.error("Dimensions {}", dimensions);
+        LOGGER.debug("The following Metrics Dimensions will be sent {}", dimensions);
     }
     
     protected static final Dimension[] meterDims = {count, meanRate, rate1m, rate5m, rate15m};
