@@ -39,8 +39,8 @@ Here is a list of default properties used:
     kafka.graphite.metrics.group=kafka
     # This can be use to exclude some metrics from graphite 
     # since kafka has quite a lot of metrics, it is useful
-    # if you have many topics/partitions.
-    kafka.graphite.metrics.exclude.regex=<not set>
+    # if you have many topics/partitions. For example :
+    kafka.graphite.metrics.exclude.regex=(kafka.network.*|kafka.*.topic.*)
 
     # Each metric provides multiple dimensions: min, max, meanRate, etc
     # This might be too much data.
