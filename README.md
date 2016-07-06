@@ -36,6 +36,7 @@ Here is a list of default properties used:
 
     kafka.graphite.metrics.host=localhost
     kafka.graphite.metrics.port=2003
+    # The group value is going to be part of the metrics name to distinguish between different brokers
     kafka.graphite.metrics.group=kafka
     # This can be use to exclude some metrics from graphite 
     # since kafka has quite a lot of metrics, it is useful
