@@ -5,7 +5,7 @@ Kafka Graphite Metrics Reporter
 
 This is a simple reporter for kafka using the 
 [GraphiteReporter](https://dropwizard.github.io/metrics/2.2.0/apidocs/com/yammer/metrics/reporting/GraphiteReporter.html). It works with
-kafka 0.8.x version.
+kafka 0.8.x and 0.9.x versions.
 
 Big thanks to Maxime Brugidou from Criteo who did the initial commit of the Ganglia version,
 available here https://github.com/criteo/kafka-ganglia
@@ -13,10 +13,10 @@ available here https://github.com/criteo/kafka-ganglia
 Install On Broker
 ------------
 
-1. Build the `kafka-graphite-1.0.2.jar` jar using `mvn package` or download it from the releases.
+1. Build the `kafka-graphite-1.0.*.jar` jar using `mvn package` or download it from the releases.
    Hint: The jar will include the metrics-graphite dependency
    which is not brought by Kafka.
-2. Add `kafka-graphite-1.0.2.jar` to the `libs/` directory of your kafka broker installation
+2. Add `kafka-graphite-1.0.*.jar` to the `libs/` directory of your kafka broker installation
 3. Configure the broker (see the configuration section below)
 4. Restart the broker
 
