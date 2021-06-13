@@ -18,19 +18,19 @@
 
 package com.criteo.kafka;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import com.yammer.metrics.core.Clock;
+import com.yammer.metrics.core.MetricPredicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Clock;
-import com.yammer.metrics.core.MetricPredicate;
+import java.io.IOException;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 import kafka.metrics.KafkaMetricsConfig;
 import kafka.metrics.KafkaMetricsReporter;
+import kafka.metrics.KafkaYammerMetrics;
 import kafka.utils.VerifiableProperties;
 
 public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, KafkaGraphiteMetricsReporterMBean {
@@ -100,12 +100,12 @@ public class KafkaGraphiteMetricsReporter implements KafkaMetricsReporter, Kafka
         }
     }
 
-
+    //Metrics was deprecated in 2.6 and it was replaced with KafkaYammerMetrics
     private FilteredGraphiteReporter buildGraphiteReporter() {
         FilteredGraphiteReporter graphiteReporter = null;
         try {
             graphiteReporter = new FilteredGraphiteReporter(
-                    Metrics.defaultRegistry(),
+                    KafkaYammerMetrics.defaultRegistry(),
                     metricPrefix,
                     metricPredicate,
                     metricDimensions,
